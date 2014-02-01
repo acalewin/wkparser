@@ -14,6 +14,8 @@ class wkreader:
     def __load(self):
         """Get known kanji from WK up to user's level"""
         try:
+            if (self.api == False or self.api == ''):
+                raise Exception('No API key')
             url = "https://www.wanikani.com/api/user/%s/%s/" % (self.api, 'kanji')
             resp = requests.get(url=url)
             self.data = json.loads(resp.content)
@@ -32,9 +34,12 @@ class wkreader:
         self.kanji = dict()
         for t in [u'apprentice', u'guru', u'enlighten', u'master',u'burned']:
             self.kanji[t] = set()
-        for k in self.data['requested_information']:
-            if (k[u'user_specific']):
-                self.kanji[k[u'user_specific'][u'srs']].add(k[u'character'])
+        try:
+            for k in self.data['requested_information']:
+                if (k[u'user_specific']):
+                    self.kanji[k[u'user_specific'][u'srs']].add(k[u'character'])
+        except KeyError:
+            print "No kanji data present to be used. No cache and/or api call failed"
 
     def test_sentence(self,sent, threshold=90):
         """Find known kanji by srs level, kick back if sentence is over known threshold"""
