@@ -6,4 +6,4 @@ If the percentage of known kanji in the line is above threshold it kicks the lin
 it caches the kanji data in kanji_cache.txt in case you want to use it offline.
 
 Usage is:
-   python wkreader.py -a <apikey> -i <input file> [-t <threshold percentage>] [-p] [-b]
+   python wkreader.py -a &lt;apikey&gt; -i &lt;input file&gt; [-t &lt;threshold percentage&gt;] [-p] [-b]
