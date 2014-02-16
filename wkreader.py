@@ -45,7 +45,7 @@ class wkreader:
         """Find known kanji by srs level, kick back if sentence is over known threshold"""
         num_kanji = 0
         known_kanji = 0
-        for k in re.findall(u'[\u4E00-\u9FFF]', sent, re.UNICODE):
+        for k in re.findall(u'[\u3400-\u4db0\u4E00-\u9FFF]', sent, re.UNICODE):
             num_kanji += 1
             if (k in self.kanji['burned']) or (k in self.kanji['enlighten']):
                 known_kanji += 1
@@ -64,10 +64,11 @@ if __name__ == "__main__":
     api = ''
     pre_context = False
     post_context = False
+    f_enc = 'utf-8'
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:t:a:bp", ["infile=", "threshold=", "api=", "before", "post"])
+        opts, args = getopt.getopt(sys.argv[1:], "hi:t:a:bpe:", ["infile=", "threshold=", "api=", "before", "post", "encoding="])
     except getopt.GetoptError:
-        print 'wkreader.py -a <apikey> -i <inputfile> [-t <threshold>]'
+        print 'wkreader.py -a <apikey> -i <inputfile> [-t <threshold>] [-p] [-a] [-e <fileencoding>]'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
@@ -83,19 +84,25 @@ if __name__ == "__main__":
             pre_context = True
         elif opt in ('-p', '--post'):
             post_context = True
+        elif opt in ('-e', '--encoding'):
+            f_enc = arg
     print "File: %s\nAPI Key: %s\nKnown Threshold: %d\nBefore: %r\nPost: %r" % (infile, api, threshold, pre_context, post_context)
     wk = wkreader(api)
     last_line = ''
     last_print = False
-    with codecs.open(infile, "r", "utf-8") as f:
+    with codecs.open(infile, "r", f_enc) as f:
+#    with open(infile, "r") as f:
         for line in f:
             if post_context and last_print:
                 print line.encode('utf-8')
+                #print line
             if wk.test_sentence(line, threshold):
                 print '-' * 20
                 if pre_context:
                     print last_line.encode('utf-8')
+                    #print last_line
                 print line.encode('utf-8')
+                #print line
                 last_print = True
             else:
                 last_print = False
